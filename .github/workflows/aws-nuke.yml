@@ -27,6 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' || ( github.event_name == 'workflow_dispatch' && github.event.inputs.delete != 'true' )
     permissions:
+      contents: read
       id-token: write
     steps:
       - name: Harden Runner
@@ -49,6 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'schedule' || ( github.event_name == 'workflow_dispatch' && github.event.inputs.delete == 'true' )
     permissions:
+      contents: read
       id-token: write
     steps:
       - name: Harden Runner
