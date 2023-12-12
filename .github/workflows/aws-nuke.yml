@@ -45,7 +45,7 @@ jobs:
       - name: aws-nuke
         uses: "docker://quay.io/rebuy/aws-nuke:v2.25.0"
         with:
-          args: "--config ./sandbox-nuke.yml --force --force-sleep 3 --lame"
+          args: "--config ./sandbox-nuke.yml --force --force-sleep 3"
 
       - uses: sarisia/actions-status-discord@9904e3130b8905d5b973df25623f17672dcb3466 # v1.13.0
         if: failure()
