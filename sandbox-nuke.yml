@@ -1,0 +1,44 @@
+regions:
+  - global
+  - us-east-1
+#  - us-east-2
+#  - us-west-1
+#  - us-west-2
+
+account-blocklist:
+  - "999999999999" # production
+
+# cat out.nuke.txt | grep "would remove" | grep "sndbx" | sed -r 's/^(global|us-east-1) - ([A-Za-z0-9]*) - ([A-Za-z0-9\\\/\.:-]*( -\> [A-Za-z0-9:\\\/\.:-]*)?).*/\2:\n  - "\3"/'
+accounts:
+  "234656776442":
+    filters:
+      IAMGroup:
+        - "brd-sndbx-ue1-core-admins"
+      IAMGroupPolicyAttachment:
+        - "brd-sndbx-ue1-core-admins -> AdministratorAccess"
+      IAMOpenIDConnectProvider:
+        - "arn:aws:iam::234656776442:oidc-provider/token.actions.githubusercontent.com"
+      IAMUserGroupAttachment:
+        - "brd-sndbx-ue1-core-bendoerr -> brd-sndbx-ue1-core-admins"
+      IAMLoginProfile:
+        - "brd-sndbx-ue1-core-bendoerr"
+      IAMUser:
+        - "brd-sndbx-ue1-core-apply"
+        - "brd-sndbx-ue1-core-bendoerr"
+      IAMUserAccessKey:
+        - "brd-sndbx-ue1-core-apply -> AKIATNIVCID5MPCVHYF7"
+        - "brd-sndbx-ue1-core-bendoerr -> AKIATNIVCID5NJ6DAKXG"
+      IAMPolicy:
+        - "arn:aws:iam::234656776442:policy/brd-sndbx-ue1-core-apply-1"
+        - "arn:aws:iam::234656776442:policy/brd-sndbx-ue1-core-apply-2"
+      IAMRole:
+        - "OrganizationAccountAccessRole"
+        - "brd-sndbx-ue1-core-admins"
+        - "brd-sndbx-ue1-core-apply"
+      IAMRolePolicyAttachment:
+        - "OrganizationAccountAccessRole -> AdministratorAccess"
+        - "brd-sndbx-ue1-core-admins -> AdministratorAccess"
+        - "brd-sndbx-ue1-core-apply -> brd-sndbx-ue1-core-apply-1"
+        - "brd-sndbx-ue1-core-apply -> brd-sndbx-ue1-core-apply-2"
+      IAMVirtualMFADevice:
+        - "arn:aws:iam::234656776442:mfa/1Password"
