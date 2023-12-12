@@ -2,7 +2,13 @@ name: AWS Nuke
 
 on:
   # Enable manual runs
+  # Enable manual runs
   workflow_dispatch:
+    inputs:
+      delete:
+        description: 'Set to "true" to actually delete stuff'
+        required: true
+        default: 'false'
 
   # Enable pull request for testing
   pull_request:
@@ -11,14 +17,15 @@ on:
   # Nuke testing account nightly
   schedule:
     # Run at noon UTC, 4 or 5am PT
-    - cron:  '0 12 * * *'
+    - cron:  '0 */6 * * *'
 
 permissions:
   contents: read
 
 jobs:
-  nuke:
+  dry-run:
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || ( github.event_name == 'workflow_dispatch' && github.event.inputs.delete != 'true' )
     permissions:
       id-token: write
     steps:
@@ -27,16 +34,36 @@ jobs:
         with:
           egress-policy: audit
 
-      - uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491 # v5.0.0
+      - uses: aws-actions/configure-aws-credentials@010d0da01d0b5a38af31e9c3470dbfdabdecca3a # v4.0.1
         with:
-          go-version: "1.21.4"
+          role-to-assume: arn:aws:iam::234656776442:role/brd-sndbx-ue1-core-apply
+          aws-region: us-east-1
+
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: aws-nuke
+        uses: "docker://quay.io/rebuy/aws-nuke:v2.25.0"
+        with:
+          args: "--config ./sandbox-nuke.yml --force --force-sleep 3"
+  no-dry-run:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || ( github.event_name == 'workflow_dispatch' && github.event.inputs.delete == 'true' )
+    permissions:
+      id-token: write
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@eb238b55efaa70779f274895e782ed17c84f2895 # v2.6.1
+        with:
+          egress-policy: audit
 
       - uses: aws-actions/configure-aws-credentials@010d0da01d0b5a38af31e9c3470dbfdabdecca3a # v4.0.1
         with:
           role-to-assume: arn:aws:iam::234656776442:role/brd-sndbx-ue1-core-apply
           aws-region: us-east-1
 
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
       - name: aws-nuke
         uses: "docker://quay.io/rebuy/aws-nuke:v2.25.0"
         with:
-          args: "--config sandbox-nuke.yml --force --force-sleep 3 --no-dry-run"
+          args: "--config ./sandbox-nuke.yml --force --force-sleep 3"
