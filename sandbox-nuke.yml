@@ -32,11 +32,13 @@ accounts:
         - "arn:aws:iam::234656776442:policy/brd-sndbx-ue1-core-apply-1"
         - "arn:aws:iam::234656776442:policy/brd-sndbx-ue1-core-apply-2"
       IAMRole:
-        - "brd-sndbx-ue1-core-apply"
         - "OrganizationAccountAccessRole"
+        - "brd-sndbx-ue1-core-admins"
+        - "brd-sndbx-ue1-core-apply"
       IAMRolePolicyAttachment:
-        - "brd-sndbx-ue1-core-apply -> brd-sndbx-ue1-core-apply-1"
         - "OrganizationAccountAccessRole -> AdministratorAccess"
+        - "brd-sndbx-ue1-core-admins -> AdministratorAccess"
+        - "brd-sndbx-ue1-core-apply -> brd-sndbx-ue1-core-apply-1"
         - "brd-sndbx-ue1-core-apply -> brd-sndbx-ue1-core-apply-2"
       IAMVirtualMFADevice:
         - "arn:aws:iam::234656776442:mfa/1Password"
