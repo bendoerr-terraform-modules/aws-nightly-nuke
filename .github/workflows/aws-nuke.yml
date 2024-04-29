@@ -40,14 +40,14 @@ jobs:
           role-to-assume: arn:aws:iam::234656776442:role/brd-sndbx-ue1-core-admins
           aws-region: us-east-1
 
-      - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+      - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
 
       - name: aws-nuke
         uses: "docker://quay.io/rebuy/aws-nuke:v2.25.0"
         with:
           args: "--config ./sandbox-nuke.yml --force --force-sleep 3"
 
-      - uses: sarisia/actions-status-discord@8b35962ad57c30272ae149c9ee193887b39e1b69 # v1.14.0
+      - uses: sarisia/actions-status-discord@6712a17f7d0531d44cd42ca2a878b0bdfd07b62a # v1.14.1
         if: failure()
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
@@ -69,14 +69,14 @@ jobs:
           role-to-assume: arn:aws:iam::234656776442:role/brd-sndbx-ue1-core-admins
           aws-region: us-east-1
 
-      - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+      - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
 
       - name: aws-nuke
         uses: "docker://quay.io/rebuy/aws-nuke:v2.25.0"
         with:
           args: "--config ./sandbox-nuke.yml --force --force-sleep 3 --no-dry-run"
 
-      - uses: sarisia/actions-status-discord@8b35962ad57c30272ae149c9ee193887b39e1b69 # v1.14.0
+      - uses: sarisia/actions-status-discord@6712a17f7d0531d44cd42ca2a878b0bdfd07b62a # v1.14.1
         if: failure()
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
