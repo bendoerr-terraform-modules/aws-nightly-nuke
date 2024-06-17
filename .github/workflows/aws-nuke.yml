@@ -31,7 +31,7 @@ jobs:
       id-token: write
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
+        uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
         with:
           egress-policy: audit
 
@@ -40,14 +40,14 @@ jobs:
           role-to-assume: arn:aws:iam::234656776442:role/brd-sndbx-ue1-core-admins
           aws-region: us-east-1
 
-      - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
 
       - name: aws-nuke
         uses: "docker://quay.io/rebuy/aws-nuke:v2.25.0"
         with:
           args: "--config ./sandbox-nuke.yml --force --force-sleep 3"
 
-      - uses: sarisia/actions-status-discord@8b35962ad57c30272ae149c9ee193887b39e1b69 # v1.14.0
+      - uses: sarisia/actions-status-discord@4138d2d190a466c986fe9842407284d9fc3e7793 # v1.14.3
         if: failure()
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
@@ -60,7 +60,7 @@ jobs:
       id-token: write
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
+        uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
         with:
           egress-policy: audit
 
@@ -69,14 +69,14 @@ jobs:
           role-to-assume: arn:aws:iam::234656776442:role/brd-sndbx-ue1-core-admins
           aws-region: us-east-1
 
-      - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
 
       - name: aws-nuke
         uses: "docker://quay.io/rebuy/aws-nuke:v2.25.0"
         with:
           args: "--config ./sandbox-nuke.yml --force --force-sleep 3 --no-dry-run"
 
-      - uses: sarisia/actions-status-discord@8b35962ad57c30272ae149c9ee193887b39e1b69 # v1.14.0
+      - uses: sarisia/actions-status-discord@4138d2d190a466c986fe9842407284d9fc3e7793 # v1.14.3
         if: failure()
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
