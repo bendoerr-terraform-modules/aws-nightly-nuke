@@ -47,7 +47,7 @@ jobs:
         with:
           args: "--config ./sandbox-nuke.yml --force --force-sleep 3"
 
-      - uses: sarisia/actions-status-discord@448a59224349c2bf9611e68b88787f2b0011965f # v1.14.5
+      - uses: sarisia/actions-status-discord@e07f00231a481562bfb3d827bfd8ac800b7d2b87 # v1.14.6
         if: failure()
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
@@ -76,7 +76,7 @@ jobs:
         with:
           args: "--config ./sandbox-nuke.yml --force --force-sleep 3 --no-dry-run"
 
-      - uses: sarisia/actions-status-discord@448a59224349c2bf9611e68b88787f2b0011965f # v1.14.5
+      - uses: sarisia/actions-status-discord@e07f00231a481562bfb3d827bfd8ac800b7d2b87 # v1.14.6
         if: failure()
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
