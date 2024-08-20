@@ -2,7 +2,6 @@ name: AWS Nuke
 
 on:
   # Enable manual runs
-  # Enable manual runs
   workflow_dispatch:
     inputs:
       delete:
@@ -42,6 +41,9 @@ jobs:
 
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
 
+      # Ensure that an account alias is set or aws-nuke fails
+      - run: aws iam create-account-alias --account-alias brd-sndbx || true
+
       - name: aws-nuke
         uses: "docker://quay.io/rebuy/aws-nuke:v2.25.0"
         with:
@@ -70,6 +72,9 @@ jobs:
           aws-region: us-east-1
 
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+
+      # Ensure that an account alias is set or aws-nuke fails
+      - run: aws iam create-account-alias --account-alias brd-sndbx || true
 
       - name: aws-nuke
         uses: "docker://quay.io/rebuy/aws-nuke:v2.25.0"
