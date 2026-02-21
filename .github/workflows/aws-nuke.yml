@@ -54,7 +54,7 @@ jobs:
           sed -i "s/__KEY_ID_BENDOERR__/${KEY_ID_BENDOERR:?}/g" sandbox-nuke.yml
 
       - name: aws-nuke
-        uses: "docker://ghcr.io/ekristen/aws-nuke:v3.63.4"
+        uses: "docker://ghcr.io/ekristen/aws-nuke:v3.63.4@sha256:2530381b49b7326a49f04320930a3a6ce5911d7090f62850df6078f26222bd4e"
         with:
           args: "run --config ./sandbox-nuke.yml --force --force-sleep 3"
 
@@ -95,7 +95,7 @@ jobs:
           sed -i "s/__KEY_ID_BENDOERR__/${KEY_ID_BENDOERR:?}/g" sandbox-nuke.yml
 
       - name: aws-nuke
-        uses: "docker://ghcr.io/ekristen/aws-nuke:v3.63.4"
+        uses: "docker://ghcr.io/ekristen/aws-nuke:v3.63.4@sha256:2530381b49b7326a49f04320930a3a6ce5911d7090f62850df6078f26222bd4e"
         with:
           args: "run --config ./sandbox-nuke.yml --force --force-sleep 3 --no-dry-run"
 
