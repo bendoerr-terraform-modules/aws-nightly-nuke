@@ -50,8 +50,12 @@ jobs:
           KEY_ID_APPLY: ${{ secrets.SANDBOX_NUKE_KEY_ID_APPLY }}
           KEY_ID_BENDOERR: ${{ secrets.SANDBOX_NUKE_KEY_ID_BENDOERR }}
         run: |
-          sed -i "s/__KEY_ID_APPLY__/${KEY_ID_APPLY:?}/g" sandbox-nuke.yml
-          sed -i "s/__KEY_ID_BENDOERR__/${KEY_ID_BENDOERR:?}/g" sandbox-nuke.yml
+          : "${KEY_ID_APPLY:?SANDBOX_NUKE_KEY_ID_APPLY secret is not set or empty}"
+          : "${KEY_ID_BENDOERR:?SANDBOX_NUKE_KEY_ID_BENDOERR secret is not set or empty}"
+          sed -i "s/__KEY_ID_APPLY__/${KEY_ID_APPLY}/g" sandbox-nuke.yml
+          grep -q "${KEY_ID_APPLY}" sandbox-nuke.yml || { echo "ERROR: __KEY_ID_APPLY__ placeholder not found in sandbox-nuke.yml"; exit 1; }
+          sed -i "s/__KEY_ID_BENDOERR__/${KEY_ID_BENDOERR}/g" sandbox-nuke.yml
+          grep -q "${KEY_ID_BENDOERR}" sandbox-nuke.yml || { echo "ERROR: __KEY_ID_BENDOERR__ placeholder not found in sandbox-nuke.yml"; exit 1; }
 
       - name: aws-nuke
         uses: "docker://ghcr.io/ekristen/aws-nuke:v3.63.4@sha256:2530381b49b7326a49f04320930a3a6ce5911d7090f62850df6078f26222bd4e"
@@ -91,8 +95,12 @@ jobs:
           KEY_ID_APPLY: ${{ secrets.SANDBOX_NUKE_KEY_ID_APPLY }}
           KEY_ID_BENDOERR: ${{ secrets.SANDBOX_NUKE_KEY_ID_BENDOERR }}
         run: |
-          sed -i "s/__KEY_ID_APPLY__/${KEY_ID_APPLY:?}/g" sandbox-nuke.yml
-          sed -i "s/__KEY_ID_BENDOERR__/${KEY_ID_BENDOERR:?}/g" sandbox-nuke.yml
+          : "${KEY_ID_APPLY:?SANDBOX_NUKE_KEY_ID_APPLY secret is not set or empty}"
+          : "${KEY_ID_BENDOERR:?SANDBOX_NUKE_KEY_ID_BENDOERR secret is not set or empty}"
+          sed -i "s/__KEY_ID_APPLY__/${KEY_ID_APPLY}/g" sandbox-nuke.yml
+          grep -q "${KEY_ID_APPLY}" sandbox-nuke.yml || { echo "ERROR: __KEY_ID_APPLY__ placeholder not found in sandbox-nuke.yml"; exit 1; }
+          sed -i "s/__KEY_ID_BENDOERR__/${KEY_ID_BENDOERR}/g" sandbox-nuke.yml
+          grep -q "${KEY_ID_BENDOERR}" sandbox-nuke.yml || { echo "ERROR: __KEY_ID_BENDOERR__ placeholder not found in sandbox-nuke.yml"; exit 1; }
 
       - name: aws-nuke
         uses: "docker://ghcr.io/ekristen/aws-nuke:v3.63.4@sha256:2530381b49b7326a49f04320930a3a6ce5911d7090f62850df6078f26222bd4e"
