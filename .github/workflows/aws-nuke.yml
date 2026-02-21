@@ -50,8 +50,8 @@ jobs:
           KEY_ID_APPLY: ${{ secrets.SANDBOX_NUKE_KEY_ID_APPLY }}
           KEY_ID_BENDOERR: ${{ secrets.SANDBOX_NUKE_KEY_ID_BENDOERR }}
         run: |
-          sed -i "s/__KEY_ID_APPLY__/${KEY_ID_APPLY}/g" sandbox-nuke.yml
-          sed -i "s/__KEY_ID_BENDOERR__/${KEY_ID_BENDOERR}/g" sandbox-nuke.yml
+          sed -i "s/__KEY_ID_APPLY__/${KEY_ID_APPLY:?}/g" sandbox-nuke.yml
+          sed -i "s/__KEY_ID_BENDOERR__/${KEY_ID_BENDOERR:?}/g" sandbox-nuke.yml
 
       - name: aws-nuke
         uses: "docker://ghcr.io/ekristen/aws-nuke:v3.63.4"
@@ -91,8 +91,8 @@ jobs:
           KEY_ID_APPLY: ${{ secrets.SANDBOX_NUKE_KEY_ID_APPLY }}
           KEY_ID_BENDOERR: ${{ secrets.SANDBOX_NUKE_KEY_ID_BENDOERR }}
         run: |
-          sed -i "s/__KEY_ID_APPLY__/${KEY_ID_APPLY}/g" sandbox-nuke.yml
-          sed -i "s/__KEY_ID_BENDOERR__/${KEY_ID_BENDOERR}/g" sandbox-nuke.yml
+          sed -i "s/__KEY_ID_APPLY__/${KEY_ID_APPLY:?}/g" sandbox-nuke.yml
+          sed -i "s/__KEY_ID_BENDOERR__/${KEY_ID_BENDOERR:?}/g" sandbox-nuke.yml
 
       - name: aws-nuke
         uses: "docker://ghcr.io/ekristen/aws-nuke:v3.63.4"
