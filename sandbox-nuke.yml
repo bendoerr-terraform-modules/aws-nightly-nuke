@@ -31,8 +31,8 @@ accounts:
         - "brd-sndbx-ue1-core-apply"
         - "brd-sndbx-ue1-core-bendoerr"
       IAMUserAccessKey:
-        - "brd-sndbx-ue1-core-apply -> AKIATNIVCID5MPCVHYF7"
-        - "brd-sndbx-ue1-core-bendoerr -> AKIATNIVCID5NJ6DAKXG"
+        - "brd-sndbx-ue1-core-apply -> __KEY_ID_APPLY__"
+        - "brd-sndbx-ue1-core-bendoerr -> __KEY_ID_BENDOERR__"
       IAMPolicy:
         - "arn:aws:iam::234656776442:policy/brd-sndbx-ue1-core-apply-1"
         - "arn:aws:iam::234656776442:policy/brd-sndbx-ue1-core-apply-2"
