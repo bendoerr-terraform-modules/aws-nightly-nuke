@@ -13,3 +13,5 @@ updates:
           - "patch"
     commit-message:
       prefix: "⬆️ gha:"
+    cooldown:
+      default-days: 14
