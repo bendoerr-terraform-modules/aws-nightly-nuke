@@ -21,6 +21,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: sandbox-test
+  cancel-in-progress: false
+
 jobs:
   dry-run:
     runs-on: ubuntu-latest
