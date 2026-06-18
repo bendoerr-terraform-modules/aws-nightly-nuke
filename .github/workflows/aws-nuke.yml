@@ -45,8 +45,10 @@ jobs:
 
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      # Ensure that an account alias is set or aws-nuke fails
-      - run: aws iam create-account-alias --account-alias brd-sndbx || true
+      # Ensure that an account alias is set or aws-nuke fails.
+      # Use the canonical alias (module.label.id in infra-testing-sandbox) so the
+      # nightly run stops drifting it away from the Terraform-declared value.
+      - run: aws iam create-account-alias --account-alias brd-sndbx-ue1-core-testing || true
 
       # Inject secret key IDs into config before running aws-nuke
       - name: Prepare config
@@ -90,8 +92,10 @@ jobs:
 
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      # Ensure that an account alias is set or aws-nuke fails
-      - run: aws iam create-account-alias --account-alias brd-sndbx || true
+      # Ensure that an account alias is set or aws-nuke fails.
+      # Use the canonical alias (module.label.id in infra-testing-sandbox) so the
+      # nightly run stops drifting it away from the Terraform-declared value.
+      - run: aws iam create-account-alias --account-alias brd-sndbx-ue1-core-testing || true
 
       # Inject secret key IDs into config before running aws-nuke
       - name: Prepare config

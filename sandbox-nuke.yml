@@ -12,6 +12,10 @@ resource-types:
   excludes:
     # these fail...
     - OSPackage
+    # Terraform (infra-testing-sandbox) owns the account password policy
+    # (create_account_password_policy = true). Without this exclude the nightly
+    # nuke deletes it, so every `terraform plan` shows a perpetual recreate.
+    - IAMAccountPasswordPolicy
 
 # cat out.nuke.txt | grep "would remove" | grep "sndbx" | sed -r 's/^(global|us-east-1) - ([A-Za-z0-9]*) - ([A-Za-z0-9\\\/\.:-]*( -\> [A-Za-z0-9:\\\/\.:-]*)?).*/\2:\n  - "\3"/'
 accounts:
@@ -36,6 +40,7 @@ accounts:
       IAMPolicy:
         - "arn:aws:iam::234656776442:policy/brd-sndbx-ue1-core-apply-1"
         - "arn:aws:iam::234656776442:policy/brd-sndbx-ue1-core-apply-2"
+        - "arn:aws:iam::234656776442:policy/brd-sndbx-ue1-core-apply-3"
       IAMRole:
         - "OrganizationAccountAccessRole"
         - "brd-sndbx-ue1-core-admins"
@@ -45,5 +50,6 @@ accounts:
         - "brd-sndbx-ue1-core-admins -> AdministratorAccess"
         - "brd-sndbx-ue1-core-apply -> brd-sndbx-ue1-core-apply-1"
         - "brd-sndbx-ue1-core-apply -> brd-sndbx-ue1-core-apply-2"
+        - "brd-sndbx-ue1-core-apply -> brd-sndbx-ue1-core-apply-3"
       IAMVirtualMFADevice:
         - "arn:aws:iam::234656776442:mfa/1Password"
