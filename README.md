@@ -25,7 +25,7 @@ You can trigger a run manually via **Actions → AWS Nuke → Run workflow**:
 | Field | Value |
 |-------|-------|
 | Account ID | `234656776442` |
-| Alias | `brd-sndbx` |
+| Alias | `brd-sndbx-ue1-core-testing` |
 | Region | `us-east-1` (+ `global`) |
 | Auth | OIDC via `brd-sndbx-ue1-core-admins` role |
 
@@ -36,9 +36,10 @@ The following resources are **excluded** from deletion (see `sandbox-nuke.yml`):
 - **IAM Users**: `brd-sndbx-ue1-core-apply`, `brd-sndbx-ue1-core-bendoerr`
 - **IAM Roles**: `OrganizationAccountAccessRole`, `brd-sndbx-ue1-core-admins`, `brd-sndbx-ue1-core-apply`
 - **IAM Group**: `brd-sndbx-ue1-core-admins` (and its policy attachments)
-- **IAM Policies**: `brd-sndbx-ue1-core-apply-1`, `brd-sndbx-ue1-core-apply-2`
+- **IAM Policies**: `brd-sndbx-ue1-core-apply-1`, `brd-sndbx-ue1-core-apply-2`, `brd-sndbx-ue1-core-apply-3`
 - **OIDC Provider**: GitHub Actions OIDC (`token.actions.githubusercontent.com`)
 - **MFA Device**: `1Password` virtual MFA
+- **Account Password Policy**: owned by Terraform (`infra-testing-sandbox`); excluded so the nightly run doesn't delete it
 - **IAM Access Keys**: Protected via secrets (key IDs stored as GitHub repo secrets)
 - **IAM Login Profile & Group Attachments**: For the `bendoerr` user
 
