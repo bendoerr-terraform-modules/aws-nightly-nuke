@@ -28,7 +28,13 @@ concurrency:
 jobs:
   dry-run:
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' || ( github.event_name == 'workflow_dispatch' && github.event.inputs.delete != 'true' )
+    # Skip on Dependabot PRs: GitHub does not expose the SANDBOX_NUKE_KEY_ID_* secrets to
+    # dependabot-author PRs, so the "Prepare config" guard fails every time. Dependabot only
+    # bumps action/dep versions and never touches sandbox-nuke.yml, so there is nothing for
+    # the dry-run to validate on those PRs. (dry-run is not a required status check.)
+    if: |
+      ( github.event_name == 'pull_request' || ( github.event_name == 'workflow_dispatch' && github.event.inputs.delete != 'true' ) )
+      && github.actor != 'dependabot[bot]'
     permissions:
       contents: read
       id-token: write
