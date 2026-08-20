@@ -38,6 +38,10 @@ accounts:
         - "brd-sndbx-ue1-core-apply -> __KEY_ID_APPLY__"
         - "brd-sndbx-ue1-core-bendoerr -> __KEY_ID_BENDOERR__"
       IAMPolicy:
+        # Instance-profile grant for terratest (fod efs-access); Ben-authorized
+        # 2026-08-20. Delete this line + the attachment line below when the
+        # actions are folded into brd-sndbx-ue1-core-apply-2.
+        - "arn:aws:iam::234656776442:policy/oldmanbendobot/brd-sndbx-ue1-core-apply-instance-profiles"
         - "arn:aws:iam::234656776442:policy/brd-sndbx-ue1-core-apply-1"
         - "arn:aws:iam::234656776442:policy/brd-sndbx-ue1-core-apply-2"
         - "arn:aws:iam::234656776442:policy/brd-sndbx-ue1-core-apply-3"
@@ -51,5 +55,6 @@ accounts:
         - "brd-sndbx-ue1-core-apply -> brd-sndbx-ue1-core-apply-1"
         - "brd-sndbx-ue1-core-apply -> brd-sndbx-ue1-core-apply-2"
         - "brd-sndbx-ue1-core-apply -> brd-sndbx-ue1-core-apply-3"
+        - "brd-sndbx-ue1-core-apply -> brd-sndbx-ue1-core-apply-instance-profiles"
       IAMVirtualMFADevice:
         - "arn:aws:iam::234656776442:mfa/1Password"
