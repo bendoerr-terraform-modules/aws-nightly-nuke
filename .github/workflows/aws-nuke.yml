@@ -164,12 +164,10 @@ jobs:
             networkmanager.us-west-2.amazonaws.com:443
             objects.githubusercontent.com:443
             opsworks-cm.us-east-1.amazonaws.com:443
-            opsworks.us-east-1.amazonaws.com:443
             osis.us-east-1.amazonaws.com:443
             pinpoint.us-east-1.amazonaws.com:443
             pipes.us-east-1.amazonaws.com:443
             polly.us-east-1.amazonaws.com:443
-            qldb.us-east-1.amazonaws.com:443
             quicksight.us-east-1.amazonaws.com:443
             rds.us-east-1.amazonaws.com:443
             redshift-serverless.us-east-1.amazonaws.com:443
@@ -178,7 +176,6 @@ jobs:
             release-assets.githubusercontent.com:443
             resource-explorer-2.us-east-1.amazonaws.com:443
             resource-groups.us-east-1.amazonaws.com:443
-            robomaker.us-east-1.amazonaws.com:443
             rolesanywhere.us-east-1.amazonaws.com:443
             route53.amazonaws.com:443
             route53profiles.us-east-1.amazonaws.com:443
@@ -379,12 +376,10 @@ jobs:
             networkmanager.us-west-2.amazonaws.com:443
             objects.githubusercontent.com:443
             opsworks-cm.us-east-1.amazonaws.com:443
-            opsworks.us-east-1.amazonaws.com:443
             osis.us-east-1.amazonaws.com:443
             pinpoint.us-east-1.amazonaws.com:443
             pipes.us-east-1.amazonaws.com:443
             polly.us-east-1.amazonaws.com:443
-            qldb.us-east-1.amazonaws.com:443
             quicksight.us-east-1.amazonaws.com:443
             rds.us-east-1.amazonaws.com:443
             redshift-serverless.us-east-1.amazonaws.com:443
@@ -393,7 +388,6 @@ jobs:
             release-assets.githubusercontent.com:443
             resource-explorer-2.us-east-1.amazonaws.com:443
             resource-groups.us-east-1.amazonaws.com:443
-            robomaker.us-east-1.amazonaws.com:443
             rolesanywhere.us-east-1.amazonaws.com:443
             route53.amazonaws.com:443
             route53profiles.us-east-1.amazonaws.com:443
