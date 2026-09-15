@@ -29,6 +29,10 @@ permissions:
 jobs:
   allowlist-resolves:
     runs-on: ubuntu-latest
+    # ~160 lookups with up to 3 attempts and a 1s backoff each. A resolver that hangs rather
+    # than refusing would otherwise sit here burning a runner until the 6h default; this job
+    # has no reason to outlive a few minutes.
+    timeout-minutes: 15
     steps:
       # egress-policy: audit, NOT block, and the reason is not laziness.
       # This job's entire purpose is to perform DNS lookups against ~160 AWS endpoints.

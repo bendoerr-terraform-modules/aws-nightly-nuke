@@ -25,9 +25,26 @@
 #   reads as "every domain is dead" -- a false RED that is believed precisely because it is
 #   alarming. If the control cannot resolve, this exits 2 and asserts NOTHING about the list.
 #
-# ⚠️ RETRIES: a single NXDOMAIN is not evidence. Only a name that fails EVERY attempt counts.
-#   The failure this guards is a service RETIREMENT, which is permanent; transient lookup
-#   noise is not what we are hunting and must not red the board.
+# ⚠️ RETRIES: a single failed lookup is not evidence. Only a name that fails EVERY attempt
+#   counts. The failure this guards is a service RETIREMENT, which is permanent; transient
+#   lookup noise is not what we are hunting and must not red the board.
+#
+# ⚠️ SCOPE OF THE VERDICT, stated because the instrument is weaker than the word "dead" implies:
+#   `getent hosts` reports DID-NOT-RESOLVE. It cannot distinguish NXDOMAIN from SERVFAIL, a
+#   timeout, or a resolver refusal. We therefore say "does not resolve", never "NXDOMAIN".
+#   The direction is false-RED (a sick resolver looks like a dead service), which is the safe
+#   side AND the reason the positive control below is mandatory rather than decorative.
+#   (Lilith's catch: the header claimed a discrimination the instrument does not make.)
+#
+# 🔴 BLOCK-WISE, NOT `sort -u` — AND THIS IS THE DEFECT THAT SHIPPED IN THE FIRST DRAFT.
+#   The allowlist appears ONCE PER JOB (`no-dry-run` and `dry-run`). A first version parsed the
+#   whole file and deduped: 328 endpoint lines collapsing to 164, exactly 2x. That reads CLEAN
+#   whether the two blocks agree or not, so **a divergence between blocks was structurally
+#   invisible to the very guard meant to police them** -- and the fix that prompted this script
+#   was itself six lines across two blocks, which is precisely the shape that drifts.
+#   Parsing per-block also SCOPES the match, so a service container or a URL-with-port added
+#   elsewhere in the file can no longer manufacture a false DEAD. (Both Lilith's, both real:
+#   the second was "uninfected, not correct" -- nothing else in the file matched *today*.)
 set -uo pipefail
 
 WF="${1:-.github/workflows/aws-nuke.yml}"
@@ -53,9 +70,52 @@ if ! resolves "$CONTROL"; then
   exit 2
 fi
 
-# --- parse: every `host:port` under an allowed-endpoints block --------------------------
-mapfile -t RAW < <(grep -oE '[A-Za-z0-9_.*-]+\.[A-Za-z]{2,}:[0-9]+' "$WF" | sed 's/:[0-9]*$//' | sort -u)
+# --- parse: each allowed-endpoints block SEPARATELY, so divergence is visible -----------
+# awk: on `allowed-endpoints:` record that line's indent, then take following lines that are
+# MORE indented; the first line at or below that indent ends the block. Emits "<n>\t<host>".
+BLOCKS=$(mktemp) || { echo "NOT MEASURED - cannot create tempfile"; exit 2; }
+trap 'rm -f "$BLOCKS"' EXIT   # SAFE HERE ONLY: this holds a parse of a public file and is
+                              # cheap to regenerate, so DELETING is the cheap half. Do not
+                              # copy this idiom over a run log, where KEEPING is the cheap half.
+awk '
+  match($0, /^[[:space:]]*allowed-endpoints:/) { blk++; ind=match($0,/[^ ]/); inblk=1; next }
+  inblk {
+    if ($0 ~ /^[[:space:]]*$/) next
+    cur=match($0,/[^ ]/)
+    if (cur <= ind) { inblk=0; next }
+    if (match($0, /[A-Za-z0-9_.*-]+\.[A-Za-z]{2,}:[0-9]+/)) {
+      h=substr($0, RSTART, RLENGTH); sub(/:[0-9]+$/, "", h); print blk "\t" h
+    }
+  }
+' "$WF" > "$BLOCKS"
+
+NBLOCKS=$(cut -f1 "$BLOCKS" | sort -u | grep -c . || true)
+NLINES=$(grep -c . "$BLOCKS" || true)
+[ "${NBLOCKS:-0}" -gt 0 ] || { echo "NOT MEASURED - found ZERO allowed-endpoints blocks in $WF; an empty population is not a pass"; exit 2; }
+
+mapfile -t RAW < <(cut -f2 "$BLOCKS" | sort -u)
 [ "${#RAW[@]}" -gt 0 ] || { echo "NOT MEASURED - parsed ZERO endpoints out of $WF; an empty population is not a pass"; exit 2; }
+
+# 🔴 THE BLOCKS MUST AGREE. Compare them as SETS, pairwise against the first -- not by count,
+# because two blocks can differ while having identical sizes (one swapped entry each way).
+FIRST=$(cut -f1 "$BLOCKS" | sort -u | head -1)
+DIVERGED=0
+for b in $(cut -f1 "$BLOCKS" | sort -u); do
+  [ "$b" = "$FIRST" ] && continue
+  if ! diff -q <(awk -F'\t' -v k="$FIRST" '$1==k{print $2}' "$BLOCKS" | sort -u) \
+                <(awk -F'\t' -v k="$b"     '$1==k{print $2}' "$BLOCKS" | sort -u) >/dev/null; then
+    DIVERGED=1
+    echo "DIVERGED - allowed-endpoints block $b does not match block $FIRST:"
+    diff <(awk -F'\t' -v k="$FIRST" '$1==k{print $2}' "$BLOCKS" | sort -u) \
+         <(awk -F'\t' -v k="$b"     '$1==k{print $2}' "$BLOCKS" | sort -u) | sed 's/^/    /'
+  fi
+done
+if [ "$DIVERGED" -ne 0 ]; then
+  echo "  The jobs in this workflow are running under DIFFERENT egress policies. Whichever"
+  echo "  block is missing an entry will have its agent abort and its egress silently revert."
+  exit 1
+fi
+echo "-- $NBLOCKS allowed-endpoints block(s) · $NLINES endpoint line(s) · ${#RAW[@]} distinct · blocks AGREE --"
 
 LIVE=0; DEAD=0; WILD=0; DEADLIST=""
 for h in "${RAW[@]}"; do
@@ -74,7 +134,7 @@ if [ "$TOTAL" -ne "${#RAW[@]}" ]; then
 fi
 
 if [ "$DEAD" -gt 0 ]; then
-  echo "DEAD - $DEAD allowlist entr(y/ies) give a consistent NXDOMAIN over $ATTEMPTS attempts:"
+  echo "DEAD - $DEAD allowlist entr(y/ies) DID NOT RESOLVE on any of $ATTEMPTS attempts:"
   printf '%s' "$DEADLIST"
   echo "  Each one of these ALONE disarms harden-runner's egress policy for the whole job,"
   echo "  silently, with the step still green. Remove them ALL in one change -- removing"
