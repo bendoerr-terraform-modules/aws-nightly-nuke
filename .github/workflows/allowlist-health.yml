@@ -1,0 +1,47 @@
+name: "Allowlist health"
+
+# Does every host in aws-nuke.yml's harden-runner allowlist still resolve?
+#
+# WHY THIS IS A SCHEDULED JOB AND NOT ONLY A PR CHECK: the failure it detects is an AWS
+# SERVICE RETIREMENT, which happens on Amazon's calendar and not on ours. A PR-only check
+# would go green forever while the allowlist rotted underneath it -- exactly how three dead
+# names accumulated unnoticed. The schedule is the whole point; the PR trigger is a bonus.
+#
+# The scheduled run is deliberately visible to `ops/scheduled-health.sh`, which reads the
+# latest SCHEDULED run of every workflow in the org. That is the reader: a guard nobody
+# runs is not a guard, so this rides a surface that already fires twice a day.
+
+on:
+  schedule:
+    # Mondays 07:30 UTC. Offset well away from aws-nuke's own ticks so a slow DNS sweep
+    # cannot collide with a nuke run.
+    - cron: "30 7 * * 1"
+  pull_request:
+    paths:
+      - ".github/workflows/aws-nuke.yml"
+      - ".github/scripts/check-allowlist-resolves.sh"
+      - ".github/workflows/allowlist-health.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  allowlist-resolves:
+    runs-on: ubuntu-latest
+    steps:
+      # egress-policy: audit, NOT block, and the reason is not laziness.
+      # This job's entire purpose is to perform DNS lookups against ~160 AWS endpoints.
+      # Running it behind a block policy would mean maintaining a SECOND allowlist that can
+      # rot in exactly the way this job exists to detect -- a guard whose own guard is the
+      # bug it hunts. Audit still records egress for review without gating the lookups.
+      - name: Harden Runner
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+
+      - name: Checkout Repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Every allowlisted host still resolves
+        run: ./.github/scripts/check-allowlist-resolves.sh .github/workflows/aws-nuke.yml
