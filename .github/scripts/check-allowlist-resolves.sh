@@ -98,24 +98,36 @@ mapfile -t RAW < <(cut -f2 "$BLOCKS" | sort -u)
 
 # 🔴 THE BLOCKS MUST AGREE. Compare them as SETS, pairwise against the first -- not by count,
 # because two blocks can differ while having identical sizes (one swapped entry each way).
+# 🔴🔴 DIVERGENCE IS RECORDED, NOT RETURNED ON. The first version of this block did
+#   `exit 1` here, before the resolve loop -- so a file that was BOTH diverged AND carried a
+#   dead name reported only the divergence, and the dead name was never scanned.
+#   ⇒ **THE GUARD CONFESSED ONE SIN PER RUN: precisely the harden-runner behaviour it was
+#   written to catch, rebuilt one level up, inside the fix.** Caught by Lilith with a
+#   three-row table whose third row is the CONTROL -- a dead name planted in BOTH blocks
+#   (no divergence) proves the name IS detectable, so its silence in the combined case is
+#   the early exit and not a host that happens to resolve. Without that control the
+#   combined row proves nothing.
+#   `RAW` is the UNION across blocks, so the resolve scan is well-defined while diverged;
+#   the early exit was a choice, never a necessity.
 FIRST=$(cut -f1 "$BLOCKS" | sort -u | head -1)
 DIVERGED=0
+DIVREPORT=""
 for b in $(cut -f1 "$BLOCKS" | sort -u); do
   [ "$b" = "$FIRST" ] && continue
   if ! diff -q <(awk -F'\t' -v k="$FIRST" '$1==k{print $2}' "$BLOCKS" | sort -u) \
                 <(awk -F'\t' -v k="$b"     '$1==k{print $2}' "$BLOCKS" | sort -u) >/dev/null; then
     DIVERGED=1
-    echo "DIVERGED - allowed-endpoints block $b does not match block $FIRST:"
-    diff <(awk -F'\t' -v k="$FIRST" '$1==k{print $2}' "$BLOCKS" | sort -u) \
-         <(awk -F'\t' -v k="$b"     '$1==k{print $2}' "$BLOCKS" | sort -u) | sed 's/^/    /'
+    DIVREPORT="${DIVREPORT}DIVERGED - allowed-endpoints block $b does not match block $FIRST:
+$(diff <(awk -F'\t' -v k="$FIRST" '$1==k{print $2}' "$BLOCKS" | sort -u) \
+       <(awk -F'\t' -v k="$b"     '$1==k{print $2}' "$BLOCKS" | sort -u) | sed 's/^/    /')
+"
   fi
 done
 if [ "$DIVERGED" -ne 0 ]; then
-  echo "  The jobs in this workflow are running under DIFFERENT egress policies. Whichever"
-  echo "  block is missing an entry will have its agent abort and its egress silently revert."
-  exit 1
+  echo "-- $NBLOCKS allowed-endpoints block(s) · $NLINES endpoint line(s) · ${#RAW[@]} distinct · blocks DIVERGE (scan continues over the UNION) --"
+else
+  echo "-- $NBLOCKS allowed-endpoints block(s) · $NLINES endpoint line(s) · ${#RAW[@]} distinct · blocks AGREE --"
 fi
-echo "-- $NBLOCKS allowed-endpoints block(s) · $NLINES endpoint line(s) · ${#RAW[@]} distinct · blocks AGREE --"
 
 LIVE=0; DEAD=0; WILD=0; DEADLIST=""
 for h in "${RAW[@]}"; do
@@ -133,13 +145,22 @@ if [ "$TOTAL" -ne "${#RAW[@]}" ]; then
   exit 2
 fi
 
+# --- report EVERY finding, then exit once. One run, all sins. ---------------------------
+if [ "$DIVERGED" -ne 0 ]; then
+  printf '%s' "$DIVREPORT"
+  echo "  The jobs in this workflow are running under DIFFERENT egress policies. Whichever"
+  echo "  block is missing an entry will have its agent abort and its egress silently revert."
+fi
 if [ "$DEAD" -gt 0 ]; then
   echo "DEAD - $DEAD allowlist entr(y/ies) DID NOT RESOLVE on any of $ATTEMPTS attempts:"
   printf '%s' "$DEADLIST"
   echo "  Each one of these ALONE disarms harden-runner's egress policy for the whole job,"
   echo "  silently, with the step still green. Remove them ALL in one change -- removing"
   echo "  only the one a log happened to name just reveals the next."
+fi
+if [ "$DIVERGED" -ne 0 ] || [ "$DEAD" -gt 0 ]; then
+  echo "FOUND - divergence=$DIVERGED dead=$DEAD (both axes scanned; neither suppresses the other)"
   exit 1
 fi
-echo "CLEAN - all $LIVE resolvable-shaped allowlist entr(y/ies) resolve."
+echo "CLEAN - all $LIVE resolvable-shaped allowlist entr(y/ies) resolve, and all $NBLOCKS block(s) agree."
 exit 0

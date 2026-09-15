@@ -13,8 +13,14 @@ name: "Allowlist health"
 
 on:
   schedule:
-    # Mondays 07:30 UTC. Offset well away from aws-nuke's own ticks so a slow DNS sweep
-    # cannot collide with a nuke run.
+    # Mondays 07:30 UTC. The slot is arbitrary and nothing depends on it.
+    # An earlier version of this comment claimed the time was "offset well away from
+    # aws-nuke's own ticks so a slow DNS sweep cannot collide" -- that reasoning is wrong and
+    # was deleted rather than reworded. GitHub's scheduler has no contractual shape: measured
+    # over 843 intervals of aws-nuke's own nominally-6h cron, gaps ran 2.34h to 15.99h. You
+    # cannot offset away from a tick whose position you cannot predict.
+    # Collision is a non-issue here for a REAL reason instead: this job only performs DNS
+    # lookups. It creates, modifies and deletes nothing, so it cannot collide with anything.
     - cron: "30 7 * * 1"
   pull_request:
     paths:
