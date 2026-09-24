@@ -21,6 +21,13 @@ resource-types:
 accounts:
   "234656776442":
     filters:
+      DynamoDBTable:
+        # Cross-repo sandbox lock (infra-testing-sandbox). Terratest and this nuke
+        # coordinate through it; deleting it makes every lane fail LOCK UNREADABLE.
+        - "brd-sndbx-ue1-core-sandbox-lock"
+      DynamoDBTableItem:
+        # The live lock item. The nuke holds this lock while it runs.
+        - "brd-sndbx-ue1-core-sandbox-lock -> sandbox"
       IAMGroup:
         - "brd-sndbx-ue1-core-admins"
       IAMGroupPolicyAttachment:
@@ -45,6 +52,7 @@ accounts:
         - "arn:aws:iam::234656776442:policy/brd-sndbx-ue1-core-apply-1"
         - "arn:aws:iam::234656776442:policy/brd-sndbx-ue1-core-apply-2"
         - "arn:aws:iam::234656776442:policy/brd-sndbx-ue1-core-apply-3"
+        - "arn:aws:iam::234656776442:policy/brd-sndbx-ue1-core-sandbox-lock"
       IAMRole:
         - "OrganizationAccountAccessRole"
         - "brd-sndbx-ue1-core-admins"
@@ -56,5 +64,6 @@ accounts:
         - "brd-sndbx-ue1-core-apply -> brd-sndbx-ue1-core-apply-2"
         - "brd-sndbx-ue1-core-apply -> brd-sndbx-ue1-core-apply-3"
         - "brd-sndbx-ue1-core-apply -> brd-sndbx-ue1-core-apply-instance-profiles"
+        - "brd-sndbx-ue1-core-apply -> brd-sndbx-ue1-core-sandbox-lock"
       IAMVirtualMFADevice:
         - "arn:aws:iam::234656776442:mfa/1Password"
