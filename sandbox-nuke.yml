@@ -28,6 +28,15 @@ accounts:
       DynamoDBTableItem:
         # The live lock item. The nuke holds this lock while it runs.
         - "brd-sndbx-ue1-core-sandbox-lock -> sandbox"
+      ElasticacheUser:
+        # AWS-managed default (Valkey IAM auth), provisioned by AWS around
+        # 2026-09-29. The API rejects DeleteUser for this id (a dot is not a
+        # legal customer user id), so without this filter every run ends
+        # fatal. Upstream: https://github.com/ekristen/aws-nuke/issues/1039
+        - "default.iam-user"
+      ElasticacheUserGroup:
+        # Same AWS-managed default; DeleteUserGroup is rejected the same way.
+        - "default.iam-user-group"
       IAMGroup:
         - "brd-sndbx-ue1-core-admins"
       IAMGroupPolicyAttachment:
