@@ -15,7 +15,7 @@ resource-types:
     # Terraform (infra-testing-sandbox) owns the account password policy
     # (create_account_password_policy = true). Without this exclude the nightly
     # nuke deletes it, so every `terraform plan` shows a perpetual recreate.
-    - IAMAccountPasswordPolicy
+    - IAMAccountSettingPasswordPolicy
 
 # cat out.nuke.txt | grep "would remove" | grep "sndbx" | sed -r 's/^(global|us-east-1) - ([A-Za-z0-9]*) - ([A-Za-z0-9\\\/\.:-]*( -\> [A-Za-z0-9:\\\/\.:-]*)?).*/\2:\n  - "\3"/'
 accounts:
