@@ -426,6 +426,16 @@ jobs:
           role-to-assume: arn:aws:iam::234656776442:role/brd-sndbx-ue1-core-admins
           aws-region: us-east-1
 
+      # Hold the cross-repo sandbox lock as WRITER so no terratest lane is
+      # running in the account while it is being emptied. 2700 s of waiting plus
+      # a ~3 min nuke stays inside the role's 3600 s session.
+      - name: Acquire sandbox lock (writer)
+        uses: bendoerr-terraform-modules/workflows/.github/actions/sandbox-lock@d72cfaafccf23642aaf8bd317bf68f6d9bacd635 # v1.3.0
+        with:
+          mode: acquire
+          role: writer
+          max-wait-seconds: "2700"
+
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # Ensure that an account alias is set or aws-nuke fails.
@@ -450,6 +460,13 @@ jobs:
         uses: "docker://ghcr.io/ekristen/aws-nuke:v3.63.4@sha256:2530381b49b7326a49f04320930a3a6ce5911d7090f62850df6078f26222bd4e"
         with:
           args: "run --config ./sandbox-nuke.yml --force --force-sleep 3 --no-dry-run"
+
+      - name: Release sandbox lock
+        if: always()
+        uses: bendoerr-terraform-modules/workflows/.github/actions/sandbox-lock@d72cfaafccf23642aaf8bd317bf68f6d9bacd635 # v1.3.0
+        with:
+          mode: release
+          role: writer
 
       - uses: sarisia/actions-status-discord@eb045afee445dc055c18d3d90bd0f244fd062708 # v1.16.0
         if: failure()
