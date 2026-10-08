@@ -425,10 +425,14 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::234656776442:role/brd-sndbx-ue1-core-admins
           aws-region: us-east-1
+          # Stated, not defaulted: the lock budget below depends on it. The
+          # sandbox-lock renewer reuses these credentials, so lowering this
+          # means lowering max-wait-seconds too.
+          role-duration-seconds: 3600
 
       # Hold the cross-repo sandbox lock as WRITER so no terratest lane is
       # running in the account while it is being emptied. 2700 s of waiting plus
-      # a ~3 min nuke stays inside the role's 3600 s session.
+      # a ~3-4 min nuke stays inside the 3600 s session set on the step above.
       - name: Acquire sandbox lock (writer)
         uses: bendoerr-terraform-modules/workflows/.github/actions/sandbox-lock@d72cfaafccf23642aaf8bd317bf68f6d9bacd635 # v1.3.0
         with:
